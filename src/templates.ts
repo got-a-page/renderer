@@ -98,6 +98,7 @@ export function unclaimedPage(name: string, themeCss: string, url: string): stri
   <p class="tagline">This little corner of the web is waiting for its person.<br>
   Maybe that's you?</p>
   <a class="cta" href="https://got-a.page/claim">Claim it free - about a minute</a>
+  <p class="meta">Just claimed this name? It goes live within a few minutes of the PR merging - check back shortly.</p>
   <p class="meta">No hosting needed. No cost. Just a name and a small JSON file.</p>
 </article>
 ${FOOTER}`;
