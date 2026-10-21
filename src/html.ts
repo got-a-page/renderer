@@ -57,12 +57,13 @@ export interface LayoutOptions {
 }
 
 export function layout(o: LayoutOptions): string {
-  const image = o.image ? `<meta property="og:image" content="${esc(o.image)}"><meta name="twitter:card" content="summary_large_image">` : '<meta name="twitter:card" content="summary">';
+  const image = o.image ? `<meta property="og:image" content="${esc(o.image)}"><meta name="twitter:card" content="summary_large_image">` : '<meta property="og:image" content="https://got-a.page/assets/social-card.png"><meta name="twitter:card" content="summary_large_image">';
   return `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22 role=%22img%22 aria-label=%22got-a.page logo%22> <defs> <linearGradient id=%22bg%22 x1=%220%22 y1=%220%22 x2=%221%22 y2=%221%22> <stop offset=%220%22 stop-color=%22%23ff922b%22/> <stop offset=%221%22 stop-color=%22%23e8590c%22/> </linearGradient> </defs> <rect width=%22512%22 height=%22512%22 rx=%22112%22 fill=%22url%28%23bg%29%22/> <%21-- page with folded corner --> <g> <path d=%22M164 128 h118 l66 66 v166 a24 24 0 0 1 -24 24 H164 a24 24 0 0 1 -24 -24 V152 a24 24 0 0 1 24 -24 z%22 fill=%22%23fffaf3%22/> <path d=%22M282 128 l66 66 h-52 a14 14 0 0 1 -14 -14 v-52 z%22 fill=%22%23ffd8b5%22/> <rect x=%22176%22 y=%22228%22 width=%22124%22 height=%2218%22 rx=%229%22 fill=%22%23e8590c%22/> <rect x=%22176%22 y=%22266%22 width=%22160%22 height=%2214%22 rx=%227%22 fill=%22%23f3dcc8%22/> <rect x=%22176%22 y=%22296%22 width=%22160%22 height=%2214%22 rx=%227%22 fill=%22%23f3dcc8%22/> <rect x=%22176%22 y=%22326%22 width=%22100%22 height=%2214%22 rx=%227%22 fill=%22%23f3dcc8%22/> </g> </svg> ">
 <title>${esc(o.title)}</title>
 <meta name="description" content="${esc(o.description)}">
 <meta property="og:type" content="website">
