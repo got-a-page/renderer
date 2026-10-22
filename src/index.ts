@@ -5,9 +5,10 @@
  * all unlisted subdomains here; we look the name up in the compiled index
  * (a static JSON file published by the claim repo's CI) and render it.
  *
- * Caching: the index is fetched through Cloudflare's cache with a 5-minute
- * edge TTL, so steady-state requests never leave the edge. The GitHub API
- * is never called at request time.
+ * Caching: the index is fetched through Cloudflare's cache with a short
+ * edge TTL, and the cached copy is stored under our own 5-minute TTL -
+ * the upstream cache headers are ignored. The GitHub API is never called
+ * at request time.
  */
 
 import { themeCss, DEFAULT_THEME } from "./themes.js";
@@ -24,6 +25,7 @@ interface IndexFile {
 }
 
 const INDEX_CACHE_TTL_SECONDS = 300;
+const INDEX_FETCH_TTL_SECONDS = 60;
 const PAGE_CACHE_TTL_SECONDS = 120;
 
 /** Names that must never be treated as pages. */
@@ -41,10 +43,21 @@ async function loadIndex(env: Env): Promise<IndexFile | null> {
   const key = new Request(env.INDEX_URL);
   const hit = await cache.match(key);
   if (hit) return (await hit.json()) as IndexFile;
-  const res = await fetch(env.INDEX_URL, { cf: { cacheTtl: INDEX_CACHE_TTL_SECONDS } });
+  const res = await fetch(env.INDEX_URL, { cf: { cacheTtl: INDEX_FETCH_TTL_SECONDS } });
   if (!res.ok) return null;
-  await cache.put(key, res.clone());
-  return (await res.json()) as IndexFile;
+  // Cache our own copy, not the upstream response. GitHub Pages sends
+  // cache-control: max-age=600, and the Cache API honors that over our
+  // TTL, which kept stale indexes (and "unclaimed" pages) alive far past
+  // the intended 5 minutes.
+  const body = await res.text();
+  const stored = new Response(body, {
+    headers: {
+      "content-type": "application/json; charset=utf-8",
+      "cache-control": `public, max-age=${INDEX_CACHE_TTL_SECONDS}`,
+    },
+  });
+  await cache.put(key, stored);
+  return JSON.parse(body) as IndexFile;
 }
 
 function html(body: string, status = 200): Response {
